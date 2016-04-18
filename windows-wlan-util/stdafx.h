@@ -7,9 +7,20 @@
 
 #include "targetver.h"
 
+#include <windows.h>
+#include <wlanapi.h>
+#include <objbase.h>
+#include <wtypes.h>
+
 #include <stdio.h>
 #include <tchar.h>
 
+#include <iostream>
+#include <stdlib.h>
+#include <string>
+#include <time.h>
+#include <vector>
 
-
-// TODO: reference additional headers your program requires here
+// Need to link with Wlanapi.lib and Ole32.lib
+#pragma comment(lib, "wlanapi.lib")
+#pragma comment(lib, "ole32.lib")
