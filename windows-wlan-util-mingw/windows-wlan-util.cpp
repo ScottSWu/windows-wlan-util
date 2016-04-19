@@ -79,7 +79,7 @@ std::vector<NetworkInfo> getWifiNetworks(HANDLE hClient, GUID ifGuid) {
 	PWLAN_BSS_ENTRY bssEntry = NULL;
 
 	// Retrieve a list of available networks
-	dwResult = WlanGetNetworkBssList(hClient, &ifGuid, NULL, dot11_BSS_type_any, NULL, NULL, &bssList);
+	dwResult = WlanGetNetworkBssList(hClient, &ifGuid, NULL, dot11_BSS_type_any, 0, NULL, &bssList);
 	if (dwResult != ERROR_SUCCESS) {
 	}
 	else {
@@ -168,7 +168,7 @@ int main(int argc, char** argv)
 
 	// Interface
 	if (argc >= 3) {
-		sscanf_s(argv[2], "%d", &ifSelect);
+		sscanf(argv[2], "%d", &ifSelect);
 	}
 
 	// Setup
@@ -199,7 +199,11 @@ int main(int argc, char** argv)
 	if (bitCheck(task, TASK_LIST_INTERFACES)) {
 		for (DWORD i = 0; i < ifList->dwNumberOfItems; i++) {
 			PWLAN_INTERFACE_INFO info = (WLAN_INTERFACE_INFO *)&ifList->InterfaceInfo[i];
-			printf("% 2d  %ws\n", i, info->strInterfaceDescription);
+            printf("% 2d  ", i);
+            for (int j = 0; j < 256 && info->strInterfaceDescription[j] != 0; j++) {
+                printf("%c", (unsigned char) info->strInterfaceDescription[j]);
+            }
+            printf("\n");
 		}
 		WlanFreeMemory(ifList);
 		return 0;
