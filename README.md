@@ -14,7 +14,7 @@ Lists available wireless interfaces (0-indexed).
 ```
 > windows-wlan-util.exe scan [interface]
 ```
-Initiate a scan for wireless networks (usually takes around 3 seconds to fully populate the list). An interface can be specified by number (as returned by the `if` subcommand), otherwise it will default to interface 0. If no wireless interfaces are available, then it will print an error.
+Initiate a scan for wireless networks (usually takes around 10 seconds to fully populate the list). An interface can be specified by number (as returned by the `if` subcommand), otherwise it will default to interface 0. If no wireless interfaces are available, then it will print an error.
 
 ```
 > windows-wlan-util.exe list [interface]
