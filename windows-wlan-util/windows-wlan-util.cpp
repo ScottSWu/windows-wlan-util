@@ -78,44 +78,37 @@ std::vector<NetworkInfo> getWifiNetworks(HANDLE hClient, GUID ifGuid) {
 	// Network service
 	PWLAN_BSS_ENTRY bssEntry = NULL;
 
-	// Get a list of interfaces
-	dwResult = WlanEnumInterfaces(hClient, NULL, &ifList);
+	// Retrieve a list of available networks
+	dwResult = WlanGetNetworkBssList(hClient, &ifGuid, NULL, dot11_BSS_type_any, NULL, NULL, &bssList);
 	if (dwResult != ERROR_SUCCESS) {
-		return ns;
 	}
 	else {
-		// Retrieve a list of available networks
-		dwResult = WlanGetNetworkBssList(hClient, &ifGuid, NULL, dot11_BSS_type_any, NULL, NULL, &bssList);
-		if (dwResult != ERROR_SUCCESS) {
-		}
-		else {
-			// For each network
-			for (unsigned int j = 0; j < bssList->dwNumberOfItems; j++) {
-				// Grab the network
-				bssEntry = (WLAN_BSS_ENTRY *)&bssList->wlanBssEntries[j];
+		// For each network
+		for (unsigned int j = 0; j < bssList->dwNumberOfItems; j++) {
+			// Grab the network
+			bssEntry = (WLAN_BSS_ENTRY *)&bssList->wlanBssEntries[j];
 
-				// Network info struct
-				NetworkInfo ni;
-				// SSID
-				for (int k = 0, l = bssEntry->dot11Ssid.uSSIDLength; k < 32; k++) {
-					if (k < l) ni.ssid[k] = (int)bssEntry->dot11Ssid.ucSSID[k];
-					else ni.ssid[k] = 0;
-				}
-				// Hardware MAC Address
-				for (int k = 0, l = 6; k < 32; k++) {
-					if (k < l) ni.bssid[k] = (int)bssEntry->dot11Bssid[k];
-					else ni.bssid[k] = 0;
-				}
-				// Channel Frequency
-				ni.frequency = bssEntry->ulChCenterFrequency;
-				// Rssi
-				ni.rssi = bssEntry->lRssi;
-				// Signal quality
-				ni.quality = bssEntry->uLinkQuality;
-
-				// Add to the list
-				ns.push_back(ni);
+			// Network info struct
+			NetworkInfo ni;
+			// SSID
+			for (int k = 0, l = bssEntry->dot11Ssid.uSSIDLength; k < 32; k++) {
+				if (k < l) ni.ssid[k] = (int)bssEntry->dot11Ssid.ucSSID[k];
+				else ni.ssid[k] = 0;
 			}
+			// Hardware MAC Address
+			for (int k = 0, l = 6; k < 32; k++) {
+				if (k < l) ni.bssid[k] = (int)bssEntry->dot11Bssid[k];
+				else ni.bssid[k] = 0;
+			}
+			// Channel Frequency
+			ni.frequency = bssEntry->ulChCenterFrequency;
+			// Rssi
+			ni.rssi = bssEntry->lRssi;
+			// Signal quality
+			ni.quality = bssEntry->uLinkQuality;
+
+			// Add to the list
+			ns.push_back(ni);
 		}
 	}
 
@@ -123,10 +116,6 @@ std::vector<NetworkInfo> getWifiNetworks(HANDLE hClient, GUID ifGuid) {
 	if (bssList != NULL) {
 		WlanFreeMemory(bssList);
 		bssList = NULL;
-	}
-	if (ifList != NULL) {
-		WlanFreeMemory(ifList);
-		ifList = NULL;
 	}
 
 	// Finish
@@ -216,7 +205,7 @@ int main(int argc, char** argv)
 	}
 	else {
 		if (ifSelect >= ifList->dwNumberOfItems) {
-			printf("Warning: Interface %d does not exist. Defaulting to interface 0.\n", ifSelect);
+			//printf("Warning: Interface %d does not exist. Defaulting to interface 0.\n", ifSelect);
 			ifSelect = 0;
 		}
 		ifGuid = ((WLAN_INTERFACE_INFO *)&ifList->InterfaceInfo[ifSelect])->InterfaceGuid;
@@ -233,12 +222,12 @@ int main(int argc, char** argv)
 		
 		for (auto itr = networks.begin(); itr != networks.end(); itr++) {
 			// Rssi
-			printf("%-4d    ", (*itr).rssi);
+			printf("% 4d  ", (*itr).rssi);
 			// Quality
-			printf("% 4d    ", (*itr).quality);
+			printf("% 4d  ", (*itr).quality);
 			// Bssid
-			for (int i = 0; i < 6; i++) printf("%02x", (*itr).bssid[i]) && (i<5) && printf("-");
-			printf("    ");
+			for (int i = 0; i < 6; i++) printf("%02x", (*itr).bssid[i]) && (i<5) && printf(":");
+			printf("  ");
 			// Ssid
 			for (int i = 0; i < 32; i++) printf("%c", (*itr).ssid[i]);
 			printf("\n");
