@@ -24,3 +24,8 @@ Initiate a scan for wireless networks (usually takes around 3 seconds to fully p
  -53    78  xx:xx:xx:xx:72:c2  ssid3
 ```
 Queries the list of wireless networks found by the last scan. The first column is the RSSI in dbm. The second column is the "signal quality". The third column is the MAC address. The fourth column is the SSID.
+
+```
+> windows-wlan-util.exe query [interface]
+```
+Does both a scan and a query (does not wait for the scan, but will update it for the next listing).

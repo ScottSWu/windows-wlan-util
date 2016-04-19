@@ -131,7 +131,7 @@ void usage(const char* name) {
 const int TASK_USAGE = 0;
 const int TASK_LIST_INTERFACES = 1;
 const int TASK_SCAN_NETWORKS = 2;
-const int TASK_LIST_NETWORKS = 3;
+const int TASK_LIST_NETWORKS = 4;
 
 // Main program
 int main(int argc, char** argv)
@@ -155,6 +155,9 @@ int main(int argc, char** argv)
 		}
 		else if (strncmp(argv[1], "list", 4) == 0) {
 			task = TASK_LIST_NETWORKS;
+		}
+		else if (strncmp(argv[1], "query", 5) == 0) {
+			task = TASK_SCAN_NETWORKS | TASK_LIST_NETWORKS;
 		}
 	}
 
@@ -188,7 +191,7 @@ int main(int argc, char** argv)
 	}
 
 	// Print interfaces and exit
-	if (task == TASK_LIST_INTERFACES) {
+	if (task & TASK_LIST_INTERFACES == TASK_LIST_INTERFACES) {
 		for (DWORD i = 0; i < ifList->dwNumberOfItems; i++) {
 			PWLAN_INTERFACE_INFO info = (WLAN_INTERFACE_INFO *)&ifList->InterfaceInfo[i];
 			printf("% 2d  %ws\n", i, info->strInterfaceDescription);
@@ -212,11 +215,12 @@ int main(int argc, char** argv)
 	}
 	WlanFreeMemory(ifList);
 
-	if (task == TASK_SCAN_NETWORKS) {
+	if (task & TASK_SCAN_NETWORKS == TASK_SCAN_NETWORKS) {
 		// Scan for network
 		scanWifiNetworks(whandle, ifGuid);
 	}
-	else if (task == TASK_LIST_NETWORKS) {
+
+	if (task & TASK_LIST_NETWORKS == TASK_LIST_NETWORKS) {
 		// List available networks
 		std::vector<NetworkInfo> networks = getWifiNetworks(whandle, ifGuid);
 		
